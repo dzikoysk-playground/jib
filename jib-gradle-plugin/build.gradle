@@ -6,18 +6,25 @@ plugins {
   id 'eclipse'
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "panda-repository"
+            url = uri("https://maven.reposilite.com/releases")
+            credentials {
+                username = System.getenv("MAVEN_NAME") ?: property("mavenUser").toString()
+                password = System.getenv("MAVEN_TOKEN") ?: property("mavenPassword").toString()
+            }
+        }
+    }
+}
+
 /* LOCAL SNAPSHOT DEV */
 // to install for local testing - do not load this plugin when publishing to plugin portal
 // 'maven-publish' and 'com.gradle.plugin-publish' do not interact well with each other
 // https://discuss.gradle.org/t/debug-an-issue-in-publish-plugin-gradle-plugin-not-being-prepended-to-groupid/32720
 if (version.contains('SNAPSHOT')) {
   apply plugin: 'maven-publish'
-
-  publishing {
-    repositories {
-      mavenLocal()
-    }
-  }
 
   task install {
     dependsOn publishToMavenLocal
@@ -71,7 +78,7 @@ gradlePlugin {
   testSourceSets sourceSets.integrationTest, sourceSets.test
   plugins {
     jibPlugin {
-      id = 'com.google.cloud.tools.jib'
+      id = 'net.dzikoysk.jib-fork.jib-gradle-plugin'
       displayName = 'Jib'
       description = 'Containerize your Java application'
       implementationClass = 'com.google.cloud.tools.jib.gradle.JibPlugin'

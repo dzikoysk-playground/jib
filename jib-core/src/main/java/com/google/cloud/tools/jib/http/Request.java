@@ -110,7 +110,7 @@ public class Request {
     this.httpTimeout = builder.httpTimeout;
   }
 
-  HttpHeaders getHeaders() {
+  public HttpHeaders getHeaders() {
     return headers;
   }
 

@@ -67,7 +67,7 @@ import net.ltgt.gradle.errorprone.CheckSeverity
 }
 
 subprojects {
-  group 'com.google.cloud.tools'
+  group 'net.dzikoysk.jib-fork'
 
   repositories {
     mavenCentral()
@@ -292,6 +292,17 @@ subprojects {
     }
 
     publishing {
+        repositories {
+            maven {
+                name = "panda-repository"
+                url = uri("https://maven.reposilite.com/releases")
+                credentials {
+                    username = System.getenv("MAVEN_NAME") ?: property("mavenUser").toString()
+                    password = System.getenv("MAVEN_TOKEN") ?: property("mavenPassword").toString()
+                }
+            }
+        }
+
       publications {
         mavenJava(MavenPublication) {
           pom {
