@@ -35,9 +35,12 @@ import java.net.ConnectException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.net.ssl.SSLException;
@@ -77,6 +80,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
  * https://docs.docker.com/registry/insecure/#deploy-a-plain-http-registry
  */
 public class FailoverHttpClient {
+
+  public static final List<BiConsumer<URL, Request>> REQUEST_PROCESSORS = new ArrayList<>();
 
   /** Represents failover actions taken. To be recorded in the failover history. */
   private static enum Failover {
@@ -256,6 +261,8 @@ public class FailoverHttpClient {
       }
       throw new SSLException("insecure HTTP connection not allowed: " + url);
     }
+
+    REQUEST_PROCESSORS.forEach(processor -> processor.accept(url, request));
 
     Optional<Response> fastPathResponse = followFailoverHistory(httpMethod, url, request);
     if (fastPathResponse.isPresent()) {
